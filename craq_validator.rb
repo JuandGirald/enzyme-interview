@@ -36,12 +36,16 @@ class CraqValidator
   end
 
   private
+    # check if terminal option was picked when a question wasn't answered
+    # add error if not
     def check_when_not_answered(index)
       return if !terminal_question.empty? && complete_if_selected_picked
 
       not_answered(index)
     end
 
+    # check if a question was answered after a terminal option was picked
+    # add error when true
     def check_answered_when_completed(options, index)
       return if terminal_question.empty?
       return if index == terminal_question[:question]
@@ -49,6 +53,7 @@ class CraqValidator
       answered_when_completed(index) if complete_if_selected_picked
     end
 
+    # return a boolean if the terminal question option was picked in the answer
     def complete_if_selected_picked
       answers["q#{terminal_question[:question]}".to_sym] == terminal_question[:option]
     end
@@ -60,12 +65,10 @@ class CraqValidator
       @terminal_question = { question: index, option: terminal_questions(options)[0] }
     end
 
+    # return an array with the index of the option inside a terminal question if exists
+    # => [1]
     def terminal_questions(options)
       options.each_index.select{ |i| options[i][:complete_if_selected] == true }
-    end
-
-    def mark_as_invalid
-      @valid = false if @valid
     end
 
     def not_answered(index)
@@ -81,5 +84,9 @@ class CraqValidator
     def answered_when_completed(index)
       mark_as_invalid
       errors["q#{index}".to_sym] = ERRORS[:answered_when_completed]
+    end
+
+    def mark_as_invalid
+      @valid = false if @valid
     end
 end
